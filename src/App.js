@@ -45,6 +45,7 @@ export default function App() {
     if (fwLine.startsWith("*")) fwLine = fwLine.substring(1); // remove leading *
     info.fwVersion = fwLine.split(" ")[0]; // take first word as version
   } else if (data.startsWith("*SSID")) {
+      console.log(data);
       // Remove leading *SSID, and split by ','
       const ssidParts = data.replace("*SSID,", "").split(",");
       // Take elements from index 3 onward as actual SSIDs
@@ -86,32 +87,43 @@ export default function App() {
     const decoder = new TextDecoder();
 
     const readLoop = async () => {
-      try {
-        while (true) {
-          const { value, done } = await reader.read();
-          if (done) break;
-          if (value) {
-            const text = decoder.decode(value);
-            setUartData((prev) => prev + text);
+  try {
+    while (true) {
+      const { value, done } = await reader.read();
+      if (done) break;
+      if (value) {
+        const text = decoder.decode(value);
+        setUartData((prev) => prev + text);
 
-            // Split by '#' to handle multiple messages in one chunk
-            const messages = text.split("#");
+        // Append to buffer
+        uartBuffer += text;
 
-            messages.forEach((msg) => {
-              const line = msg.trim();
-              if (line.startsWith("*MAC:") || line.startsWith("*FW:") || line.startsWith("*SSID:")) {
-                parseDeviceInfo(line + "#"); // include trailing # if parser needs it
-              }
-            });
+        // Split by '#' to find complete messages
+        const messages = uartBuffer.split("#");
+
+        // Keep the last incomplete message in buffer
+        uartBuffer = messages.pop();
+
+        // Parse only complete messages
+        messages.forEach((msg) => {
+          const line = msg.trim();
+          if (
+            line.startsWith("*MAC:") ||
+            line.startsWith("*FW:") ||
+            line.startsWith("*SSID")
+          ) {
+            parseDeviceInfo(line + "#"); // include # if needed
           }
-
-        }
-      } catch (err) {
-        console.error("Read loop stopped:", err);
-      } finally {
-        reader.releaseLock();
+        });
       }
-    };
+    }
+  } catch (err) {
+    console.error("Read loop stopped:", err);
+  } finally {
+    reader.releaseLock();
+  }
+};
+
 
     readLoop();
   } catch (err) {

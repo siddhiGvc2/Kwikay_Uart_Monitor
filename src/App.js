@@ -145,7 +145,7 @@ let uartBuffer = "";
             line.startsWith("*MAC:") ||
             line.startsWith("*FW:") ||
             line.startsWith("*SSID") ||
-            line.startsWith("*HBT-S")
+            line.startsWith("*HBT-S#")
           ) {
             parseDeviceInfo(line + "#"); // include # if needed
           }

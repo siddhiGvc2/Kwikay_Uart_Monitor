@@ -41,47 +41,51 @@ export default function App() {
   };
 
   // Connect to UART
-  const connectSerial = async () => {
-    try {
-      const selectedPort = await navigator.serial.requestPort();
-      await selectedPort.open({ baudRate: 115200 });
-      setPort(selectedPort);
-      setStatus("Connected");
+ const connectSerial = async () => {
+  try {
+    const selectedPort = await navigator.serial.requestPort();
+    await selectedPort.open({ baudRate: 115200 });
+    setPort(selectedPort);
+    setStatus("Connected");
 
-      // Setup writer
-      const writer = selectedPort.writable.getWriter();
-      setWriter(writer);
+    // Setup writer
+    const writer = selectedPort.writable.getWriter();
+    setWriter(writer);
 
-      // Setup reader
-      const reader = selectedPort.readable.getReader();
-      setReader(reader);
+    // 🟢 Automatically send *RST# every time we connect/reconnect
+    await writer.write(new TextEncoder().encode("*RST#\n"));
 
-      const decoder = new TextDecoder();
+    // Setup reader
+    const reader = selectedPort.readable.getReader();
+    setReader(reader);
 
-      const readLoop = async () => {
-        try {
-          while (true) {
-            const { value, done } = await reader.read();
-            if (done) break;
-            if (value) {
-              const text = decoder.decode(value);
-              setUartData((prev) => prev + text);
-              parseDeviceInfo(text); // Parse each incoming chunk
-            }
+    const decoder = new TextDecoder();
+
+    const readLoop = async () => {
+      try {
+        while (true) {
+          const { value, done } = await reader.read();
+          if (done) break;
+          if (value) {
+            const text = decoder.decode(value);
+            setUartData((prev) => prev + text);
+            parseDeviceInfo(text); // Update device info
           }
-        } catch (err) {
-          console.error("Read loop stopped:", err);
-        } finally {
-          reader.releaseLock();
         }
-      };
+      } catch (err) {
+        console.error("Read loop stopped:", err);
+      } finally {
+        reader.releaseLock();
+      }
+    };
 
-      readLoop();
-    } catch (err) {
-      console.error("Error connecting to UART:", err);
-      setStatus("Error");
-    }
-  };
+    readLoop();
+  } catch (err) {
+    console.error("Error connecting to UART:", err);
+    setStatus("Error");
+  }
+};
+
 
   // Disconnect UART
   const disconnectSerial = async () => {

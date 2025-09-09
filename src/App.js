@@ -27,18 +27,37 @@ export default function App() {
 
   // Parse terminal data into device info
   const parseDeviceInfo = (data) => {
-    const lines = data.split(/\r?\n/);
-    const info = { macId: "", fwVersion: "", serialNumber: "", ssid: "" };
+  const info = { macId: "", fwVersion: "", serialNumber: "", ssid: "" };
 
-    lines.forEach((line) => {
-      if (line.startsWith("MAC:")) info.macId = line.split("MAC:")[1].trim();
-      else if (line.startsWith("FW:")) info.fwVersion = line.split("FW:")[1].trim();
-      else if (line.startsWith("Serial:")) info.serialNumber = line.split("Serial:")[1].trim();
-      else if (line.startsWith("SSID:")) info.ssid = line.split("SSID:")[1].trim();
-    });
+  // Split data by lines ending with #
+  const lines = data.split("#");
 
-    setDeviceInfo(info);
-  };
+  lines.forEach((line) => {
+    line = line.trim();
+    if (line.startsWith("*MAC:")) {
+      // Example: *MAC:D4:8A:FC:C3:F0:34:999999
+      const macLine = line.replace("*MAC:", "").trim();
+      const parts = macLine.split(":");
+      // MAC is first 6 parts, serial is last
+      if (parts.length >= 7) {
+        info.macId = parts.slice(0, 6).join(":");
+        info.serialNumber = parts[6];
+      }
+    } else if (line.startsWith("*FW:")) {
+      // Example: *FW:*Kwikpay_040925_VER_1.24 Naico Ltd
+      const fwLine = line.replace("*FW:", "").trim();
+      // Remove any leading '*' if present
+      info.fwVersion = fwLine.replace(/^\*/, "").split(" ")[0]; 
+    }
+    // Optionally, parse SSID if present in some line
+    else if (line.startsWith("*SSID:")) {
+      info.ssid = line.replace("*SSID:", "").trim();
+    }
+  });
+
+  setDeviceInfo(info);
+};
+
 
   // Connect to UART
  const connectSerial = async () => {

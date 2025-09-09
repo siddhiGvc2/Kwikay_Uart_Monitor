@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import "./App.css";
 
 export default function App() {
@@ -7,6 +7,16 @@ export default function App() {
   const [reader, setReader] = useState(null);
   const [uartData, setUartData] = useState("");
   const [msg, setMsg] = useState("");
+  const [status, setStatus] = useState("Disconnected");
+
+  const terminalRef = useRef(null);
+
+  // Auto-scroll terminal when new data comes
+  useEffect(() => {
+    if (terminalRef.current) {
+      terminalRef.current.scrollTop = terminalRef.current.scrollHeight;
+    }
+  }, [uartData]);
 
   // Connect to UART
   const connectSerial = async () => {
@@ -14,6 +24,7 @@ export default function App() {
       const selectedPort = await navigator.serial.requestPort();
       await selectedPort.open({ baudRate: 115200 });
       setPort(selectedPort);
+      setStatus("Connected");
 
       // Setup writer
       const writer = selectedPort.writable.getWriter();
@@ -25,6 +36,7 @@ export default function App() {
 
       const decoder = new TextDecoder();
 
+      // Read loop
       const readLoop = async () => {
         try {
           while (true) {
@@ -44,10 +56,11 @@ export default function App() {
       readLoop();
     } catch (err) {
       console.error("Error connecting to UART:", err);
+      setStatus("Error");
     }
   };
 
-  // Disconnect UART + clear terminal
+  // Disconnect UART
   const disconnectSerial = async () => {
     try {
       if (reader) {
@@ -63,8 +76,9 @@ export default function App() {
         await port.close();
         setPort(null);
       }
-      setUartData(""); // 🟢 Clear terminal data on disconnect
-      console.log("✅ Disconnected from UART and cleared data");
+      setUartData(""); // Clear terminal
+      setStatus("Disconnected");
+      console.log("✅ Disconnected from UART");
     } catch (err) {
       console.error("Error disconnecting:", err);
     }
@@ -72,7 +86,7 @@ export default function App() {
 
   // Send message
   const sendSerial = async () => {
-    if (!writer) return;
+    if (!writer || !msg) return;
     try {
       await writer.write(new TextEncoder().encode(msg + "\n"));
       setMsg("");
@@ -86,6 +100,12 @@ export default function App() {
       <div className="card">
         <h1 className="title">UART Dashboard</h1>
 
+        {/* Connection Status */}
+        <p className={`status ${status === "Connected" ? "connected" : "disconnected"}`}>
+          Status: {status}
+        </p>
+
+        {/* Connect / Disconnect Buttons */}
         {!port ? (
           <div className="center">
             <button onClick={connectSerial} className="btn connect">
@@ -100,6 +120,7 @@ export default function App() {
           </div>
         )}
 
+        {/* Send Section */}
         <div className="send-section">
           <input
             type="text"
@@ -108,13 +129,21 @@ export default function App() {
             placeholder="Enter UART command"
             className="input"
           />
-          <button onClick={sendSerial} className="btn send">
+          <button onClick={sendSerial} className="btn send" disabled={!writer || !msg}>
             Send
+          </button>
+          <button
+            onClick={() => setUartData("")}
+            className="btn clear"
+            disabled={!uartData}
+          >
+            Clear Terminal
           </button>
         </div>
 
+        {/* Terminal Output */}
         <h2 className="subtitle">Incoming UART Data:</h2>
-        <div className="terminal">
+        <div className="terminal" ref={terminalRef}>
           <pre>{uartData || "No data yet..."}</pre>
         </div>
       </div>

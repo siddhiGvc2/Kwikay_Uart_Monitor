@@ -29,6 +29,7 @@ export default function App() {
 
   // Parse terminal data into device info
   const parseDeviceInfo = (data) => {
+    console.log(data);
   const info = { macId: "", fwVersion: "", serialNumber: "", ssid: "" ,hbt_timer:0,hbt_counter:0};
 
  if (data.startsWith("*MAC:")) {

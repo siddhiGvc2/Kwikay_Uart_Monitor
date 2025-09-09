@@ -15,11 +15,11 @@ export default function App() {
       await selectedPort.open({ baudRate: 115200 });
       setPort(selectedPort);
 
-      // Setup writer for sending
+      // Setup writer
       const writer = selectedPort.writable.getWriter();
       setWriter(writer);
 
-      // Setup reader for receiving
+      // Setup reader
       const reader = selectedPort.readable.getReader();
       setReader(reader);
 
@@ -47,7 +47,7 @@ export default function App() {
     }
   };
 
-  // Disconnect UART (proper release)
+  // Disconnect UART + clear terminal
   const disconnectSerial = async () => {
     try {
       if (reader) {
@@ -63,13 +63,14 @@ export default function App() {
         await port.close();
         setPort(null);
       }
-      console.log("✅ Disconnected from UART");
+      setUartData(""); // 🟢 Clear terminal data on disconnect
+      console.log("✅ Disconnected from UART and cleared data");
     } catch (err) {
       console.error("Error disconnecting:", err);
     }
   };
 
-  // Send message to UART
+  // Send message
   const sendSerial = async () => {
     if (!writer) return;
     try {

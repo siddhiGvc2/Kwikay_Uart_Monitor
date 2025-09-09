@@ -139,6 +139,7 @@ let uartBuffer = "";
         uartBuffer = messages.pop();
 
         // Parse only complete messages
+        console.log(messages);
         messages.forEach((msg) => {
           const line = msg.trim();
           if (

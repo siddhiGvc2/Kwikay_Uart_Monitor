@@ -52,7 +52,7 @@ export default function App() {
       // Remove leading *SSID, and split by ','
       const ssidParts = data.replace("*SSID,", "").split(",");
       // Take elements from index 3 onward as actual SSIDs
-      const ssids = ssidParts.slice(4).filter(Boolean); 
+      const ssids = ssidParts.slice(2).filter(Boolean); 
       info.ssid = ssids.join(", ").replace(/#$/, ""); // Join multiple SSIDs
     }
     else if(data.startsWith("*HBT-")){

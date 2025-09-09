@@ -52,7 +52,7 @@ export default function App() {
       // Remove leading *SSID, and split by ','
       const ssidParts = data.replace("*SSID,", "").split(",");
       // Take elements from index 3 onward as actual SSIDs
-      const ssids = ssidParts.slice(3).filter(Boolean); 
+      const ssids = ssidParts.slice(4).filter(Boolean); 
       info.ssid = ssids.join(", ").replace(/#$/, ""); // Join multiple SSIDs
     }
     else if(data.startsWith("*HBT-")){
@@ -116,6 +116,9 @@ let uartBuffer = "";
 
     // 🟢 Automatically send *RST# every time we connect/reconnect
     await writer.write(new TextEncoder().encode("*RST#\n"));
+    setTimeout(async()=>{
+      await writer.write(new TextEncoder().encode("*SSID?#\n"));
+    },5000)
 
     // Setup reader
     const reader = selectedPort.readable.getReader();

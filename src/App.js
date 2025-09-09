@@ -44,9 +44,14 @@ export default function App() {
     let fwLine = data.replace("*FW:", "").trim();
     if (fwLine.startsWith("*")) fwLine = fwLine.substring(1); // remove leading *
     info.fwVersion = fwLine.split(" ")[0]; // take first word as version
-  } else if (data.startsWith("*SSID:")) {
-    info.ssid = data.replace("*SSID:", "").trim();
-  }
+  } else if (data.startsWith("*SSID")) {
+      // Remove leading *SSID, and split by ','
+      const ssidParts = data.replace("*SSID,", "").split(",");
+      // Take elements from index 3 onward as actual SSIDs
+      const ssids = ssidParts.slice(3).filter(Boolean); 
+      info.ssid = ssids.join(", "); // Join multiple SSIDs
+    }
+
 
   // Update only non-empty values
   setDeviceInfo((prev) => ({

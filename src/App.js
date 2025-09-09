@@ -4,6 +4,7 @@ import "./App.css"; // Import the CSS file
 export default function App() {
   const [port, setPort] = useState(null);
   const [writer, setWriter] = useState(null);
+  const [reader, setReader] = useState(null);
   const [uartData, setUartData] = useState("");
   const [msg, setMsg] = useState("");
 
@@ -20,21 +21,48 @@ export default function App() {
 
       // Setup reader for receiving
       const reader = selectedPort.readable.getReader();
+      setReader(reader);
+
       const decoder = new TextDecoder();
 
       const readLoop = async () => {
-        while (true) {
-          const { value, done } = await reader.read();
-          if (done) break;
-          if (value) {
-            setUartData((prev) => prev + decoder.decode(value));
+        try {
+          while (true) {
+            const { value, done } = await reader.read();
+            if (done) break;
+            if (value) {
+              setUartData((prev) => prev + decoder.decode(value));
+            }
           }
+        } catch (err) {
+          console.error("Read loop stopped:", err);
         }
       };
 
       readLoop();
     } catch (err) {
       console.error("Error connecting to UART:", err);
+    }
+  };
+
+  // Disconnect UART
+  const disconnectSerial = async () => {
+    try {
+      if (reader) {
+        await reader.cancel();
+        setReader(null);
+      }
+      if (writer) {
+        writer.releaseLock();
+        setWriter(null);
+      }
+      if (port) {
+        await port.close();
+        setPort(null);
+      }
+      console.log("Disconnected from UART");
+    } catch (err) {
+      console.error("Error disconnecting:", err);
     }
   };
 
@@ -50,10 +78,16 @@ export default function App() {
       <div className="card">
         <h1 className="title">UART Dashboard</h1>
 
-        {!port && (
+        {!port ? (
           <div className="center">
             <button onClick={connectSerial} className="btn connect">
               Connect UART
+            </button>
+          </div>
+        ) : (
+          <div className="center">
+            <button onClick={disconnectSerial} className="btn disconnect">
+              Disconnect
             </button>
           </div>
         )}

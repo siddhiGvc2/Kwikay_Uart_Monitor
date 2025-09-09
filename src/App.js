@@ -29,35 +29,30 @@ export default function App() {
   const parseDeviceInfo = (data) => {
   const info = { macId: "", fwVersion: "", serialNumber: "", ssid: "" };
 
-  // Split data by lines ending with #
-  const lines = data.split("#");
-
-  lines.forEach((line) => {
-    line = line.trim();
-    if (line.startsWith("*MAC:")) {
-         console.log(data);
-      // Example: *MAC:D4:8A:FC:C3:F0:34:999999
-      const macLine = line.replace("*MAC:", "").trim();
-      const parts = macLine.split(":");
-      // MAC is first 6 parts, serial is last
-      if (parts.length >= 7) {
-        info.macId = parts.slice(0, 6).join(":");
-        info.serialNumber = parts[6];
-      }
-    } else if (line.startsWith("*FW:")) {
-      // Example: *FW:*Kwikpay_040925_VER_1.24 Naico Ltd
-      const fwLine = line.replace("*FW:", "").trim();
-      // Remove any leading '*' if present
-      info.fwVersion = fwLine.replace(/^\*/, "").split(" ")[0]; 
+  if (data.startsWith("*MAC:")) {
+    const macLine = data.replace("*MAC:", "").trim();
+    const parts = macLine.split(":");
+    if (parts.length >= 7) {
+      info.macId = parts.slice(0, 6).join(":");
+      info.serialNumber = parts[6];
     }
-    // Optionally, parse SSID if present in some line
-    else if (line.startsWith("*SSID:")) {
-      info.ssid = line.replace("*SSID:", "").trim();
-    }
-  });
+  } else if (data.startsWith("*FW:")) {
+    let fwLine = data.replace("*FW:", "").trim();
+    if (fwLine.startsWith("*")) fwLine = fwLine.substring(1); // remove leading *
+    info.fwVersion = fwLine.split(" ")[0]; // take first word as version
+  } else if (data.startsWith("*SSID:")) {
+    info.ssid = data.replace("*SSID:", "").trim();
+  }
 
-  setDeviceInfo(info);
+  // Update only non-empty values
+  setDeviceInfo((prev) => ({
+    macId: info.macId || prev.macId,
+    serialNumber: info.serialNumber || prev.serialNumber,
+    fwVersion: info.fwVersion || prev.fwVersion,
+    ssid: info.ssid || prev.ssid,
+  }));
 };
+
 
 
   // Connect to UART
@@ -89,9 +84,18 @@ export default function App() {
           if (value) {
             const text = decoder.decode(value);
             setUartData((prev) => prev + text);
-         
-            parseDeviceInfo(text); // Update device info
+
+            // Split by '#' to handle multiple messages in one chunk
+            const messages = text.split("#");
+
+            messages.forEach((msg) => {
+              const line = msg.trim();
+              if (line.startsWith("*MAC:") || line.startsWith("*FW:") || line.startsWith("*SSID:")) {
+                parseDeviceInfo(line + "#"); // include trailing # if parser needs it
+              }
+            });
           }
+
         }
       } catch (err) {
         console.error("Read loop stopped:", err);

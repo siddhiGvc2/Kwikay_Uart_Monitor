@@ -16,7 +16,10 @@ export default function App() {
     serialNumber: "",
     ssid: "",
     hbt_counter:0,
-    hbt_timer:0
+    hbt_timer:0,
+    wifi_erros:0,
+    tcp_errors:0,
+    mqtt_errors:0
   });
 
   const terminalRef = useRef(null);
@@ -30,7 +33,7 @@ export default function App() {
   // Parse terminal data into device info
   const parseDeviceInfo = (data) => {
     console.log(data);
-  const info = { macId: "", fwVersion: "", serialNumber: "", ssid: "" ,hbt_timer:0,hbt_counter:0};
+  const info = { macId: "", fwVersion: "", serialNumber: "", ssid: "" ,hbt_timer:0,hbt_counter:0, wifi_erros:0,tcp_errors:0,mqtt_errors:0};
 
  if (data.startsWith("*MAC:")) {
       console.log(data);
@@ -262,6 +265,16 @@ let uartBuffer = "";
            <div className="info-card">
              <strong>HBT-S:</strong>  {deviceInfo.hbt_counter} / {deviceInfo.hbt_timer}
            </div>
+              <div className="info-card">
+             <strong>WIFI-ERRORS:</strong>  
+           </div>
+            <div className="info-card">
+             <strong>TCP-ERRORS:</strong>  
+           </div>
+            <div className="info-card">
+             <strong>MQTT-ERRORS:</strong>  
+           </div>
+           
         </div>
 
         {/* Terminal */}

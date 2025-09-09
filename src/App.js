@@ -119,7 +119,6 @@ let uartBuffer = "";
     setReader(reader);
 
     const decoder = new TextDecoder();
-
     const readLoop = async () => {
   try {
     while (true) {
@@ -129,29 +128,21 @@ let uartBuffer = "";
         const text = decoder.decode(value);
         setUartData((prev) => prev + text);
 
-        // Append to buffer
         uartBuffer += text;
 
-        // Split by '#' to find complete messages
-        const messages = uartBuffer.split("#");
+        // ✅ Extract only complete messages like "*...#"
+        const regex = /\*[^#]*#/g;
+        let match;
+        while ((match = regex.exec(uartBuffer)) !== null) {
+          const line = match[0].trim(); // full message, e.g. "*HBT-S#"
+          parseDeviceInfo(line);        // send to parser
+        }
 
-        // Keep the last incomplete message in buffer
-        uartBuffer = messages.pop();
-
-        // Parse only complete messages
-        console.log(messages);
-        messages.forEach((msg) => {
-          const line = msg.trim();
-          if (
-            line.startsWith("*MAC:") ||
-            line.startsWith("*FW:") ||
-            line.startsWith("*SSID") ||
-            line.startsWith("*HBT-")
-          ) {
-             console.log(line);
-            parseDeviceInfo(line + "#"); // include # if needed
-          }
-        });
+        // Keep only the leftover (after last #)
+        const lastHash = uartBuffer.lastIndexOf("#");
+        if (lastHash >= 0) {
+          uartBuffer = uartBuffer.slice(lastHash + 1);
+        }
       }
     }
   } catch (err) {

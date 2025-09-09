@@ -221,10 +221,7 @@ let uartBuffer = "";
         {/* Device Info Cards */}
         <div className="info-cards">
           <div className="info-card">
-            <strong>ID:</strong> {deviceInfo.macId || "-"}/{deviceInfo.serialNumber || "-"} 
-          </div>
-          <div className="info-card">
-            <strong>FW Version:</strong> {deviceInfo.fwVersion || "-"}
+            <strong>ID:</strong> {deviceInfo.macId || "-"} / {deviceInfo.serialNumber || "-"} / {deviceInfo.fwVersion || "-"}
           </div>
           <div className="info-card">
             <strong>SSID:</strong> {deviceInfo.ssid || "-"}

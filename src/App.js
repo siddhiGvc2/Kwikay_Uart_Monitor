@@ -29,14 +29,18 @@ export default function App() {
   const parseDeviceInfo = (data) => {
   const info = { macId: "", fwVersion: "", serialNumber: "", ssid: "" };
 
-  if (data.startsWith("*MAC:")) {
-    const macLine = data.replace("*MAC:", "").trim();
-    const parts = macLine.split(":");
-    if (parts.length >= 7) {
-      info.macId = parts.slice(0, 6).join(":");
-      info.serialNumber = parts[6];
-    }
-  } else if (data.startsWith("*FW:")) {
+ if (data.startsWith("*MAC:")) {
+      console.log(data);
+      // Remove *MAC: and any leading/trailing spaces
+      const macLine = data.replace("*MAC:", "").trim();
+
+      // Split by ':' — last part is Serial Number
+      const parts = macLine.split(":");
+      if (parts.length >= 7) {
+        info.macId = parts.slice(0, 6).join(":");      // D4:8A:FC:C3:F0:34
+        info.serialNumber = parts[6];                  // 999999
+      }
+    }  else if (data.startsWith("*FW:")) {
     let fwLine = data.replace("*FW:", "").trim();
     if (fwLine.startsWith("*")) fwLine = fwLine.substring(1); // remove leading *
     info.fwVersion = fwLine.split(" ")[0]; // take first word as version

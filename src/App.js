@@ -9,14 +9,36 @@ export default function App() {
   const [msg, setMsg] = useState("");
   const [status, setStatus] = useState("Disconnected");
 
+  // Parsed device info
+  const [deviceInfo, setDeviceInfo] = useState({
+    macId: "",
+    fwVersion: "",
+    serialNumber: "",
+    ssid: "",
+  });
+
   const terminalRef = useRef(null);
 
-  // Auto-scroll terminal when new data comes
   useEffect(() => {
     if (terminalRef.current) {
       terminalRef.current.scrollTop = terminalRef.current.scrollHeight;
     }
   }, [uartData]);
+
+  // Parse terminal data into device info
+  const parseDeviceInfo = (data) => {
+    const lines = data.split(/\r?\n/);
+    const info = { macId: "", fwVersion: "", serialNumber: "", ssid: "" };
+
+    lines.forEach((line) => {
+      if (line.startsWith("MAC:")) info.macId = line.split("MAC:")[1].trim();
+      else if (line.startsWith("FW:")) info.fwVersion = line.split("FW:")[1].trim();
+      else if (line.startsWith("Serial:")) info.serialNumber = line.split("Serial:")[1].trim();
+      else if (line.startsWith("SSID:")) info.ssid = line.split("SSID:")[1].trim();
+    });
+
+    setDeviceInfo(info);
+  };
 
   // Connect to UART
   const connectSerial = async () => {
@@ -36,14 +58,15 @@ export default function App() {
 
       const decoder = new TextDecoder();
 
-      // Read loop
       const readLoop = async () => {
         try {
           while (true) {
             const { value, done } = await reader.read();
             if (done) break;
             if (value) {
-              setUartData((prev) => prev + decoder.decode(value));
+              const text = decoder.decode(value);
+              setUartData((prev) => prev + text);
+              parseDeviceInfo(text); // Parse each incoming chunk
             }
           }
         } catch (err) {
@@ -76,15 +99,15 @@ export default function App() {
         await port.close();
         setPort(null);
       }
-      setUartData(""); // Clear terminal
+      setUartData("");
+      setDeviceInfo({ macId: "", fwVersion: "", serialNumber: "", ssid: "" });
       setStatus("Disconnected");
-      console.log("✅ Disconnected from UART");
+      console.log("✅ Disconnected and cleared data");
     } catch (err) {
       console.error("Error disconnecting:", err);
     }
   };
 
-  // Send message
   const sendSerial = async () => {
     if (!writer || !msg) return;
     try {
@@ -100,12 +123,12 @@ export default function App() {
       <div className="card">
         <h1 className="title">UART Dashboard</h1>
 
-        {/* Connection Status */}
+        {/* Status */}
         <p className={`status ${status === "Connected" ? "connected" : "disconnected"}`}>
           Status: {status}
         </p>
 
-        {/* Connect / Disconnect Buttons */}
+        {/* Connect / Disconnect */}
         {!port ? (
           <div className="center">
             <button onClick={connectSerial} className="btn connect">
@@ -120,7 +143,7 @@ export default function App() {
           </div>
         )}
 
-        {/* Send Section */}
+        {/* Send */}
         <div className="send-section">
           <input
             type="text"
@@ -133,7 +156,10 @@ export default function App() {
             Send
           </button>
           <button
-            onClick={() => setUartData("")}
+            onClick={() => {
+              setUartData("");
+              setDeviceInfo({ macId: "", fwVersion: "", serialNumber: "", ssid: "" });
+            }}
             className="btn clear"
             disabled={!uartData}
           >
@@ -141,7 +167,23 @@ export default function App() {
           </button>
         </div>
 
-        {/* Terminal Output */}
+        {/* Device Info Cards */}
+        <div className="info-cards">
+          <div className="info-card">
+            <strong>MAC ID:</strong> {deviceInfo.macId || "-"}
+          </div>
+          <div className="info-card">
+            <strong>FW Version:</strong> {deviceInfo.fwVersion || "-"}
+          </div>
+          <div className="info-card">
+            <strong>Serial Number:</strong> {deviceInfo.serialNumber || "-"}
+          </div>
+          <div className="info-card">
+            <strong>SSID:</strong> {deviceInfo.ssid || "-"}
+          </div>
+        </div>
+
+        {/* Terminal */}
         <h2 className="subtitle">Incoming UART Data:</h2>
         <div className="terminal" ref={terminalRef}>
           <pre>{uartData || "No data yet..."}</pre>

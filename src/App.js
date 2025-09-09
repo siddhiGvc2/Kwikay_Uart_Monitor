@@ -55,6 +55,7 @@ export default function App() {
       info.ssid = ssids.join(", ").replace(/#$/, ""); // Join multiple SSIDs
     }
     else if(data.startsWith("*HBT-S")){
+      console.log(data);
        info.hbt_counter=deviceInfo.hbt_counter+1;
        info.hbt_timer=0;
        

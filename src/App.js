@@ -259,7 +259,7 @@ let uartBuffer = "";
             <strong>SSID:</strong> {deviceInfo.ssid || "-"}
           </div>
            <div className="info-card">
-             <strong>HBT-S:</strong>
+             <strong>HBT-S:</strong>{deviceInfo.hbt_timer} / {deviceInfo.hbt_counter}
            </div>
         </div>
 

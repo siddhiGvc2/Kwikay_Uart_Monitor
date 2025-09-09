@@ -15,6 +15,8 @@ export default function App() {
     fwVersion: "",
     serialNumber: "",
     ssid: "",
+    hbt_counter:0,
+    hbt_timer:0
   });
 
   const terminalRef = useRef(null);
@@ -27,7 +29,7 @@ export default function App() {
 
   // Parse terminal data into device info
   const parseDeviceInfo = (data) => {
-  const info = { macId: "", fwVersion: "", serialNumber: "", ssid: "" };
+  const info = { macId: "", fwVersion: "", serialNumber: "", ssid: "" ,hbt_timer:0,hbt_counter:0};
 
  if (data.startsWith("*MAC:")) {
       console.log(data);
@@ -52,6 +54,11 @@ export default function App() {
       const ssids = ssidParts.slice(3).filter(Boolean); 
       info.ssid = ssids.join(", ").replace(/#$/, ""); // Join multiple SSIDs
     }
+    else if(data.startsWith("*HBT-S")){
+       info.hbt_counter=deviceInfo.hbt_counter+1;
+       info.hbt_timer=0;
+       
+    }
 
 
   // Update only non-empty values
@@ -60,8 +67,32 @@ export default function App() {
     serialNumber: info.serialNumber || prev.serialNumber,
     fwVersion: info.fwVersion || prev.fwVersion,
     ssid: info.ssid || prev.ssid,
+    hbt_counter:info.hbt_counter || prev.hbt_counter,
+    hbt_timer:info.hbt_timer || prev.hbt_timer
   }));
 };
+
+
+useEffect(()=>{
+  let Interval;
+  if(status=="Connected")
+  {
+    Interval=setInterval(()=>{
+    setDeviceInfo((prev) => ({
+    macId: prev.macId,
+    serialNumber: prev.serialNumber,
+    fwVersion: prev.fwVersion,
+    ssid: prev.ssid,
+    hbt_counter:prev.hbt_counter,
+    hbt_timer:prev.hbt_timer+1,
+  }));
+  },1000);
+  }
+  else{
+     clearInterval(Interval);
+  }
+
+},[status]);
 
 let uartBuffer = "";
 
@@ -111,7 +142,8 @@ let uartBuffer = "";
           if (
             line.startsWith("*MAC:") ||
             line.startsWith("*FW:") ||
-            line.startsWith("*SSID")
+            line.startsWith("*SSID") ||
+            line.startsWith("*HBT-S")
           ) {
             parseDeviceInfo(line + "#"); // include # if needed
           }
@@ -226,6 +258,9 @@ let uartBuffer = "";
           <div className="info-card">
             <strong>SSID:</strong> {deviceInfo.ssid || "-"}
           </div>
+           <div className="info-card">
+             <strong>HBT-S:</strong>
+           </div>
         </div>
 
         {/* Terminal */}

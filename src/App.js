@@ -1,5 +1,5 @@
 import { useState } from "react";
-import "./App.css"; // Import the CSS file
+import "./App.css";
 
 export default function App() {
   const [port, setPort] = useState(null);
@@ -36,6 +36,8 @@ export default function App() {
           }
         } catch (err) {
           console.error("Read loop stopped:", err);
+        } finally {
+          reader.releaseLock();
         }
       };
 
@@ -45,11 +47,12 @@ export default function App() {
     }
   };
 
-  // Disconnect UART
+  // Disconnect UART (proper release)
   const disconnectSerial = async () => {
     try {
       if (reader) {
         await reader.cancel();
+        reader.releaseLock();
         setReader(null);
       }
       if (writer) {
@@ -60,7 +63,7 @@ export default function App() {
         await port.close();
         setPort(null);
       }
-      console.log("Disconnected from UART");
+      console.log("✅ Disconnected from UART");
     } catch (err) {
       console.error("Error disconnecting:", err);
     }
@@ -69,8 +72,12 @@ export default function App() {
   // Send message to UART
   const sendSerial = async () => {
     if (!writer) return;
-    await writer.write(new TextEncoder().encode(msg + "\n"));
-    setMsg("");
+    try {
+      await writer.write(new TextEncoder().encode(msg + "\n"));
+      setMsg("");
+    } catch (err) {
+      console.error("Send error:", err);
+    }
   };
 
   return (

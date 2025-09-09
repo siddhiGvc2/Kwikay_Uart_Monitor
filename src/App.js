@@ -55,7 +55,7 @@ export default function App() {
       const ssids = ssidParts.slice(3).filter(Boolean); 
       info.ssid = ssids.join(", ").replace(/#$/, ""); // Join multiple SSIDs
     }
-    else if(data.startsWith("*HBT-S")){
+    else if(data.startsWith("*HBT-")){
       console.log(data);
        info.hbt_counter=deviceInfo.hbt_counter+1;
        info.hbt_timer=0;
@@ -145,8 +145,9 @@ let uartBuffer = "";
             line.startsWith("*MAC:") ||
             line.startsWith("*FW:") ||
             line.startsWith("*SSID") ||
-            line.startsWith("*HBT-S")
+            line.startsWith("*HBT-")
           ) {
+             console.log(line);
             parseDeviceInfo(line + "#"); // include # if needed
           }
         });
@@ -261,7 +262,7 @@ let uartBuffer = "";
             <strong>SSID:</strong> {deviceInfo.ssid || "-"}
           </div>
            <div className="info-card">
-             <strong>HBT-S:</strong>{deviceInfo.hbt_timer} / {deviceInfo.hbt_counter}
+             <strong>HBT-S:</strong>  {deviceInfo.hbt_counter} / {deviceInfo.hbt_timer}
            </div>
         </div>
 

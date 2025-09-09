@@ -35,6 +35,7 @@ export default function App() {
   lines.forEach((line) => {
     line = line.trim();
     if (line.startsWith("*MAC:")) {
+         console.log(data);
       // Example: *MAC:D4:8A:FC:C3:F0:34:999999
       const macLine = line.replace("*MAC:", "").trim();
       const parts = macLine.split(":");
@@ -88,6 +89,7 @@ export default function App() {
           if (value) {
             const text = decoder.decode(value);
             setUartData((prev) => prev + text);
+         
             parseDeviceInfo(text); // Update device info
           }
         }

@@ -1,54 +1,81 @@
 import { useState } from "react";
+import "./App.css"; // Import the CSS file
 
 export default function App() {
   const [port, setPort] = useState(null);
-  const [data, setData] = useState("");
+  const [writer, setWriter] = useState(null);
+  const [uartData, setUartData] = useState("");
+  const [msg, setMsg] = useState("");
 
+  // Connect to UART
   const connectSerial = async () => {
     try {
-      const port = await navigator.serial.requestPort();
-      await port.open({ baudRate: 115200 });
-      setPort(port);
+      const selectedPort = await navigator.serial.requestPort();
+      await selectedPort.open({ baudRate: 115200 });
+      setPort(selectedPort);
 
-      const reader = port.readable.getReader();
-      while (true) {
-        const { value, done } = await reader.read();
-        if (done) break;
-        if (value) {
-          setData(prev => prev + new TextDecoder().decode(value));
+      // Setup writer for sending
+      const writer = selectedPort.writable.getWriter();
+      setWriter(writer);
+
+      // Setup reader for receiving
+      const reader = selectedPort.readable.getReader();
+      const decoder = new TextDecoder();
+
+      const readLoop = async () => {
+        while (true) {
+          const { value, done } = await reader.read();
+          if (done) break;
+          if (value) {
+            setUartData((prev) => prev + decoder.decode(value));
+          }
         }
-      }
+      };
+
+      readLoop();
     } catch (err) {
-      console.error("Serial connection failed: ", err);
+      console.error("Error connecting to UART:", err);
     }
   };
 
-  const sendSerial = async (message) => {
-    if (!port) return;
-    const writer = port.writable.getWriter();
-    await writer.write(new TextEncoder().encode(message + "\n"));
-    writer.releaseLock();
+  // Send message to UART
+  const sendSerial = async () => {
+    if (!writer) return;
+    await writer.write(new TextEncoder().encode(msg + "\n"));
+    setMsg("");
   };
 
   return (
-    <div className="p-4">
-      <h1 className="text-xl">UART via Web Serial API</h1>
-      <button 
-        onClick={connectSerial} 
-        className="p-2 bg-blue-500 text-white rounded"
-      >
-        Connect to COM Port
-      </button>
+    <div className="container">
+      <div className="card">
+        <h1 className="title">UART Dashboard</h1>
 
-      <button 
-        onClick={() => sendSerial("Hello UART")} 
-        className="p-2 bg-green-500 text-white rounded ml-2"
-      >
-        Send Data
-      </button>
+        {!port && (
+          <div className="center">
+            <button onClick={connectSerial} className="btn connect">
+              Connect UART
+            </button>
+          </div>
+        )}
 
-      <pre className="bg-gray-100 p-2 mt-4">{data}</pre>
+        <div className="send-section">
+          <input
+            type="text"
+            value={msg}
+            onChange={(e) => setMsg(e.target.value)}
+            placeholder="Enter UART command"
+            className="input"
+          />
+          <button onClick={sendSerial} className="btn send">
+            Send
+          </button>
+        </div>
+
+        <h2 className="subtitle">Incoming UART Data:</h2>
+        <div className="terminal">
+          <pre>{uartData || "No data yet..."}</pre>
+        </div>
+      </div>
     </div>
   );
 }
-

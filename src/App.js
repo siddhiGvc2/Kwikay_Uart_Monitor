@@ -38,7 +38,7 @@ export default function App() {
       const parts = macLine.split(":");
       if (parts.length >= 7) {
         info.macId = parts.slice(0, 6).join(":");      // D4:8A:FC:C3:F0:34
-        info.serialNumber = parts[6];                  // 999999
+        info.serialNumber = parts[6].replace(/#$/, "");                  // 999999
       }
     }  else if (data.startsWith("*FW:")) {
     let fwLine = data.replace("*FW:", "").trim();
@@ -50,7 +50,7 @@ export default function App() {
       const ssidParts = data.replace("*SSID,", "").split(",");
       // Take elements from index 3 onward as actual SSIDs
       const ssids = ssidParts.slice(3).filter(Boolean); 
-      info.ssid = ssids.join(", "); // Join multiple SSIDs
+      info.ssid = ssids.join(", ").replace(/#$/, ""); // Join multiple SSIDs
     }
 
 

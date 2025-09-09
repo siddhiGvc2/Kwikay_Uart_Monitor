@@ -57,8 +57,11 @@ export default function App() {
     }
     else if(data.startsWith("*HBT-")){
       console.log(data);
-       info.hbt_counter=deviceInfo.hbt_counter+1;
-       info.hbt_timer=0;
+      setDeviceInfo((prev) => ({
+    ...prev,
+    hbt_counter: (prev.hbt_counter || 0) + 1,
+    hbt_timer: 0,
+  }));
        
     }
 

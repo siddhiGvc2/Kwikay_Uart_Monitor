@@ -48,6 +48,8 @@ export default function App() {
     mqtt_status:"FAILED",
     tcp_status:"FAILED",
     wifi_status:"FAILED",
+    wifi_failure_duration: "", // Store the duration
+    wifi_failed_at: "", // Reset failure timestamp
 
   });
 
@@ -128,14 +130,24 @@ export default function App() {
         tcp_status:"SUCCESS"
       }));
     }
-     else if(data.startsWith("*WiFi:")){
-       const status = data.replace("*WiFi:", "").replace("#", "").trim(); 
-      setDeviceInfo((prev) => ({
-        ...prev,
-        ssid: status,
-        wifi_status:"SUCCESS"
-      }));
+    else if (data.startsWith("*WiFi:")) {
+      const now = Date.now();
+      setDeviceInfo((prev) => {
+        const failedAt = prev.wifi_failed_at || now;
+        const timeDiffSeconds = Math.floor((now - failedAt) / 1000); // Time diff in seconds
+
+        console.log("Time difference since failure:", timeDiffSeconds, "seconds");
+
+        return {
+          ...prev,
+          ssid: data.replace("*WiFi:", "").replace("#", "").trim(),
+          wifi_status: "SUCCESS",
+          wifi_failure_duration: timeDiffSeconds, // Store the duration
+          
+        };
+      });
     }
+
     else if (data.startsWith("*MQTT,")) {
       const match = data.match(/\*MQTT,(\d+)(?: (.+))?#/);
       const status = match && match[2] ? match[2].trim() : "SUCCESS";
@@ -159,6 +171,7 @@ export default function App() {
     }
     else if(data.startsWith("*WiFi failed bit set"))
     {
+        const now = Date.now(); 
         setDeviceInfo((prev) => {
          const lastStatus = prev.wifi_status;
          const wifi_errors =
@@ -173,7 +186,8 @@ export default function App() {
             ...prev,
             wifi_errors,
             wifi_status: "FAILED",
-            ssid:"0"
+            ssid:"0",
+            wifi_failed_at:now
           };
        
       });
@@ -197,7 +211,9 @@ export default function App() {
     mqtt_errors:info.mqtt_errors || prev.mqtt_errors,
     mqtt_status: info.mqtt_status || prev.mqtt_status,
     tcp_status:info.tcp_status || prev.tcp_status,
-    wifi_status:info.wifi_status || prev.wifi_status
+    wifi_status:info.wifi_status || prev.wifi_status,
+    wifi_failure_duration: info.wifi_failure_duration || prev.wifi_failure_duration,
+    wifi_failed_at: info.wifi_failed_at || prev.wifi_failed_at, // Reset failure timestamp
     
 
   }));
@@ -399,7 +415,7 @@ let uartBuffer = "";
              <strong>HBT-S:</strong>  {deviceInfo.hbt_counter} / {deviceInfo.hbt_timer}
            </div>
               <div className="info-card">
-             <strong>WIFI-ERRORS:</strong> {deviceInfo.wifi_errors || 0}
+             <strong>WIFI-FAILDED Time:</strong> {deviceInfo.wifi_failed_at || 0} {deviceInfo.wifi_failure_duration || 0}
            </div>
             <div className="info-card">
              <strong>TCP-ERRORS:</strong> {deviceInfo.tcp_errors || 0}

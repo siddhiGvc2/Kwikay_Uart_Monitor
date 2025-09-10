@@ -36,7 +36,7 @@ export default function App() {
     macId: "",
     fwVersion: "",
     serialNumber: "",
-    ssid:-1,
+    ssid: "",
     ssid1: "",
     ssid2: "",
     ssid3: "",
@@ -59,7 +59,7 @@ export default function App() {
   // Parse terminal data into device info
   const parseDeviceInfo = (data) => {
     console.log(data);
-  const info = { macId: "", fwVersion: "", serialNumber: "",ssid:-1, ssid1: "",ssid2:"",ssid3:"" };
+  const info = { macId: "", fwVersion: "", serialNumber: "",ssid: "", ssid1: "",ssid2:"",ssid3:"" };
 
  if (data.startsWith("*MAC:")) {
       console.log(data);
@@ -83,6 +83,7 @@ export default function App() {
       // Take elements from index 3 onward as actual SSIDs
       const ssids = ssidParts.slice(2).filter(Boolean); 
       info.ssid=ssids[0];
+      console.log("SSID",ssids[0]);
       info.ssid1 = ssids[1];// Join multiple SSIDs
       info.ssid2= ssids[2];
       info.ssid3=ssids[3].replace(/#$/, "");  

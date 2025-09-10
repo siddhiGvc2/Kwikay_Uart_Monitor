@@ -149,7 +149,8 @@ export default function App() {
     hbt_timer:info.hbt_timer || prev.hbt_timer,
     wifi_errors:info.wifi_errors || prev.wifi_errors,
     tcp_errors:info.tcp_errors || prev.tcp_errors,
-    mqtt_errors:info.mqtt_errors || prev.mqtt_errors
+    mqtt_errors:info.mqtt_errors || prev.mqtt_errors,
+    mqtt_status: info.mqtt_status || prev.mqtt_status
     
 
   }));

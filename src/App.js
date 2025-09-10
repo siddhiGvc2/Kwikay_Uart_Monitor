@@ -46,7 +46,8 @@ export default function App() {
     tcp_errors:0,
     mqtt_errors:0,
     mqtt_status:"FAILED",
-    tcp_status:"FAILED"
+    tcp_status:"FAILED",
+    wifi_status:"FAILED",
 
   });
 
@@ -110,8 +111,7 @@ export default function App() {
               ? (prev.tcp_errors || 0) + 1
               : prev.tcp_errors || 0;
 
-          console.log("TCP LAST STATUS:", lastStatus);
-          console.log("TCP Status: FAILED");
+        
 
           return {
             ...prev,
@@ -132,7 +132,8 @@ export default function App() {
        const status = data.replace("*WiFi:", "").replace("#", "").trim(); 
       setDeviceInfo((prev) => ({
         ...prev,
-        ssid: status
+        ssid: status,
+        wifi_status:"SUCCESS"
       }));
     }
     else if (data.startsWith("*MQTT,")) {
@@ -155,7 +156,28 @@ export default function App() {
       });
      
       
-    };
+    }
+    else if(data.startsWith("*WiFi failed bit set"))
+    {
+        setDeviceInfo((prev) => {
+         const lastStatus = prev.wifi_status;
+         const wifi_errors =
+            lastStatus === "SUCCESS"
+              ? (prev.wifi_errors || 0) + 1
+              : prev.wifi_errors || 0;
+
+          console.log("WIFI LAST STATUS:", lastStatus);
+          console.log("WIFI Status: FAILED");
+
+          return {
+            ...prev,
+            wifi_errors,
+            wifi_status: "FAILED",
+            ssid:"0"
+          };
+       
+      });
+    }
 
 
 
@@ -174,7 +196,8 @@ export default function App() {
     tcp_errors:info.tcp_errors || prev.tcp_errors,
     mqtt_errors:info.mqtt_errors || prev.mqtt_errors,
     mqtt_status: info.mqtt_status || prev.mqtt_status,
-    tcp_status:info.tcp_status || prev.tcp_status
+    tcp_status:info.tcp_status || prev.tcp_status,
+    wifi_status:info.wifi_status || prev.wifi_status
     
 
   }));

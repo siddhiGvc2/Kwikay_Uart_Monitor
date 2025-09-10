@@ -10,13 +10,13 @@ function InfoCard({ deviceInfo }) {
   return (
     <div className="info-card" style={{ padding: "10px", borderRadius: "5px" }}>
       <strong>SSID:</strong>{" "}
-      <span style={{ color: statusIndex === "1" ? "green" : "black" }}>
+      <span style={{ color: statusIndex === "1" ? "green" : "red" }}>
         {deviceInfo.ssid1 || "-"}
       </span>{" "}
-      <span style={{ color: statusIndex === "2" ? "green" : "black" }}>
+      <span style={{ color: statusIndex === "2" ? "green" : "red" }}>
         {deviceInfo.ssid2 || "-"}
       </span>{" "}
-      <span style={{ color: statusIndex === "3" ? "green" : "black" }}>
+      <span style={{ color: statusIndex === "3" ? "green" : "red" }}>
         {deviceInfo.ssid3 || "-"}
       </span>
     </div>
@@ -246,6 +246,13 @@ let uartBuffer = "";
     if (!writer || !msg) return;
     try {
       await writer.write(new TextEncoder().encode(msg + "\n"));
+      if(msg.includes("*RST#"))
+      {
+         setDeviceInfo((prev) => ({
+          ...prev,
+          ssid: "0"
+        }));
+      }
       setMsg("");
     } catch (err) {
       console.error("Send error:", err);

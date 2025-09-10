@@ -252,6 +252,9 @@ let uartBuffer = "";
           ...prev,
           ssid: "0"
         }));
+          setTimeout(async()=>{
+          await writer.write(new TextEncoder().encode("*SSID?#\n"));
+        },5000)
       }
       setMsg("");
     } catch (err) {

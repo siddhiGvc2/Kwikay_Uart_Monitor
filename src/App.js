@@ -293,14 +293,12 @@ let uartBuffer = "";
         </div>
 
         {/* Device Info Cards */}
-         <InfoCard deviceInfo={deviceInfo} />
-        {/* <div className="info-cards">
+        
+        <div className="info-cards">
           <div className="info-card">
             <strong>ID:</strong> {deviceInfo.macId || "-"} / {deviceInfo.serialNumber || "-"} / {deviceInfo.fwVersion || "-"}
           </div>
-          <div className="info-card">
-            <strong>SSID:</strong> {deviceInfo.ssid1 || "-"} {deviceInfo.ssid2 || "-"} {deviceInfo.ssid3 || "-"}
-          </div>
+           <InfoCard deviceInfo={deviceInfo} />
            <div className="info-card">
              <strong>HBT-S:</strong>  {deviceInfo.hbt_counter} / {deviceInfo.hbt_timer}
            </div>
@@ -314,7 +312,7 @@ let uartBuffer = "";
              <strong>MQTT-ERRORS:</strong> {deviceInfo.mqtt_errors}
            </div>
            
-        </div> */}
+        </div>
 
         {/* Terminal */}
         <h2 className="subtitle">Incoming UART Data:</h2>

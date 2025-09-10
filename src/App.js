@@ -180,27 +180,28 @@ export default function App() {
   }));
 };
 
+useEffect(() => {
+  let intervalId;
 
-useEffect(()=>{
-  let Interval;
-  if(status=="Connected")
-  {
-    Interval=setInterval(()=>{
-     setDeviceInfo((prev) => ({
+  if (status === "Connected") {
+    intervalId = setInterval(() => {
+      setDeviceInfo((prev) => ({
         ...prev,
         hbt_timer: (prev.hbt_timer || 0) + 1,
       }));
-  },1000);
-  }
-  else{
-     clearInterval(Interval);
-      setDeviceInfo((prev) => ({
-        ...prev,
-        hbt_timer: 0,
-      }));
+    }, 1000);
+  } else {
+    setDeviceInfo((prev) => ({
+      ...prev,
+      hbt_timer: 0,
+    }));
   }
 
-},[status]);
+  // Cleanup function to clear interval when component unmounts or status changes
+  return () => {
+    if (intervalId) clearInterval(intervalId);
+  };
+}, [status]);
 
 let uartBuffer = "";
 

@@ -4,7 +4,7 @@ import "./App.css";
 
 
 function InfoCard({ deviceInfo }) {
-  const statusIndex = deviceInfo; // This holds ssids[0], i.e., "0", "1", "2", etc.
+  const statusIndex = deviceInfo.ssid; // This holds ssids[0], i.e., "0", "1", "2", etc.
 
   return (
     <div className="info-card" style={{ padding: "10px", borderRadius: "5px" }}>

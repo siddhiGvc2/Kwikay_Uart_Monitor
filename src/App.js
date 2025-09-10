@@ -100,14 +100,27 @@ export default function App() {
        
     }
     else if(data.startsWith("*TCP-NOTOK#")){
-      if(deviceInfo.tcp_status=="SUCCESS")
-      {
-      setDeviceInfo((prev) => ({
-        ...prev,
-        tcp_errors: (prev.tcp_errors || 0) + 1,
-        tcp_status:"FAILED"
-      }));
-      }
+
+       
+    
+      setDeviceInfo((prev) => {
+         const lastStatus = prev.tcp_status;
+         const tcp_errors =
+            lastStatus === "SUCCESS"
+              ? (prev.tcp_errors || 0) + 1
+              : prev.tcp_errors || 0;
+
+          console.log("TCP LAST STATUS:", lastStatus);
+          console.log("TCP Status: FAILED");
+
+          return {
+            ...prev,
+            tcp_errors,
+            tcp_status: "FAILED",
+          };
+       
+      });
+      
     }
      else if(data.startsWith("*TCP-OK#")){
       setDeviceInfo((prev) => ({
@@ -128,8 +141,7 @@ export default function App() {
 
       setDeviceInfo((prev) => {
         const lastStatus = prev.mqtt_status;
-         console.log("MQTT LAST STATUS", lastStatus);
-         console.log("MQTT Status:", status);
+       
         const mqtt_errors =
           status === "FAILED" && lastStatus === "SUCCESS"
             ? (prev.mqtt_errors || 0) + 1

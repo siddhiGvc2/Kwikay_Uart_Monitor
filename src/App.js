@@ -45,6 +45,7 @@ export default function App() {
     wifi_errors:0,
     tcp_errors:0,
     mqtt_errors:0,
+    mqtt_status:"FAILED"
 
   });
 
@@ -111,18 +112,27 @@ export default function App() {
       }));
     }
     else if (data.startsWith("*MQTT,")) {
-      // Example: "*MQTT,3 FAILED#"
-      const match = data.match(/\*MQTT,\d+ (.+)#/);
-      const status = match ? match[1].trim() : null;
+      const match = data.match(/\*MQTT,(\d+)(?: (.+))?#/);
+      const status = match && match[2] ? match[2].trim() : "SUCCESS";
 
-      if (status=="FAILED") {
-        console.log("MQTT Status:", status); // "FAILED"
-        setDeviceInfo((prev) => ({
+      setDeviceInfo((prev) => {
+        const lastStatus = prev.mqtt_status || "SUCCESS";
+
+        const mqtt_errors =
+          status === "FAILED" && lastStatus === "SUCCESS"
+            ? (prev.mqtt_errors || 0) + 1
+            : prev.mqtt_errors || 0;
+
+        return {
           ...prev,
-          mqtt_errors: (prev.mqtt_errors || 0) + 1, // store "FAILED" in state
-        }));
-      }
-    }
+          mqtt_errors,
+          mqtt_status: status,
+        };
+      });
+
+      console.log("MQTT Status:", status);
+    };
+
 
 
   // Update only non-empty values

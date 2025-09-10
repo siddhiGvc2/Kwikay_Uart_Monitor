@@ -45,7 +45,8 @@ export default function App() {
     wifi_errors:0,
     tcp_errors:0,
     mqtt_errors:0,
-    mqtt_status:"FAILED"
+    mqtt_status:"FAILED",
+    tcp_status:"FAILED"
 
   });
 
@@ -99,9 +100,19 @@ export default function App() {
        
     }
     else if(data.startsWith("*TCP-NOTOK#")){
+      if(deviceInfo.tcp_status=="SUCCESS")
+      {
       setDeviceInfo((prev) => ({
         ...prev,
         tcp_errors: (prev.tcp_errors || 0) + 1,
+        tcp_status:"FAILED"
+      }));
+      }
+    }
+     else if(data.startsWith("*TCP-OK#")){
+      setDeviceInfo((prev) => ({
+        ...prev,
+        tcp_status:"SUCCESS"
       }));
     }
      else if(data.startsWith("*WiFi:")){
@@ -150,7 +161,8 @@ export default function App() {
     wifi_errors:info.wifi_errors || prev.wifi_errors,
     tcp_errors:info.tcp_errors || prev.tcp_errors,
     mqtt_errors:info.mqtt_errors || prev.mqtt_errors,
-    mqtt_status: info.mqtt_status || prev.mqtt_status
+    mqtt_status: info.mqtt_status || prev.mqtt_status,
+    tcp_status:info.tcp.status || prev.tcp_status
     
 
   }));

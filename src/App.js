@@ -6,6 +6,7 @@ import "./App.css";
 function InfoCard({ deviceInfo }) {
   const statusIndex = deviceInfo.ssid; // This holds ssids[0], i.e., "0", "1", "2", etc.
 
+  console.log(ssid);
   return (
     <div className="info-card" style={{ padding: "10px", borderRadius: "5px" }}>
       <strong>SSID:</strong>{" "}
@@ -84,7 +85,7 @@ export default function App() {
       info.ssid=ssids[0];
       info.ssid1 = ssids[1];// Join multiple SSIDs
       info.ssid2= ssids[2];
-      info.ssid3=ssids[3];
+      info.ssid3=ssids[3].replace(/#$/, "");  
     }
     else if(data.startsWith("*HBT-")){
       console.log(data);

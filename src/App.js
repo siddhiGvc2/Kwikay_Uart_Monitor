@@ -119,7 +119,7 @@ export default function App() {
         console.log("MQTT Status:", status); // "FAILED"
         setDeviceInfo((prev) => ({
           ...prev,
-          mqtt_errors: (prev.mqtt_errors_errors || 0) + 1, // store "FAILED" in state
+          mqtt_errors: (prev.mqtt_errors || 0) + 1, // store "FAILED" in state
         }));
       }
     }
@@ -136,7 +136,7 @@ export default function App() {
     ssid3: info.ssid3 || prev.ssid3,
     hbt_counter:info.hbt_counter || prev.hbt_counter,
     hbt_timer:info.hbt_timer || prev.hbt_timer,
-    wifi_erros:info.wifi_errors || prev.wifi_errors,
+    wifi_errors:info.wifi_errors || prev.wifi_errors,
     tcp_errors:info.tcp_errors || prev.tcp_errors,
     mqtt_errors:info.mqtt_errors || prev.mqtt_errors
     
@@ -335,13 +335,13 @@ let uartBuffer = "";
              <strong>HBT-S:</strong>  {deviceInfo.hbt_counter} / {deviceInfo.hbt_timer}
            </div>
               <div className="info-card">
-             <strong>WIFI-ERRORS:</strong> {deviceInfo.wifi_errors}
+             <strong>WIFI-ERRORS:</strong> {deviceInfo.wifi_errors || 0}
            </div>
             <div className="info-card">
-             <strong>TCP-ERRORS:</strong> {deviceInfo.tcp_errors}
+             <strong>TCP-ERRORS:</strong> {deviceInfo.tcp_errors || 0}
            </div>
             <div className="info-card">
-             <strong>MQTT-ERRORS:</strong> {deviceInfo.mqtt_errors}
+             <strong>MQTT-ERRORS:</strong> {deviceInfo.mqtt_errors || 0}
            </div>
            
         </div>

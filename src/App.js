@@ -169,6 +169,10 @@ useEffect(()=>{
   }
   else{
      clearInterval(Interval);
+      setDeviceInfo((prev) => ({
+        ...prev,
+        hbt_timer: 0,
+      }));
   }
 
 },[status]);

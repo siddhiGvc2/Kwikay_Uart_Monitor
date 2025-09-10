@@ -162,7 +162,7 @@ export default function App() {
     tcp_errors:info.tcp_errors || prev.tcp_errors,
     mqtt_errors:info.mqtt_errors || prev.mqtt_errors,
     mqtt_status: info.mqtt_status || prev.mqtt_status,
-    tcp_status:info.tcp.status || prev.tcp_status
+    tcp_status:info.tcp_status || prev.tcp_status
     
 
   }));

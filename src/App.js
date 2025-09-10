@@ -1,6 +1,27 @@
 import { useState, useRef, useEffect } from "react";
 import "./App.css";
 
+
+
+function InfoCard({ deviceInfo }) {
+  const statusIndex = deviceInfo; // This holds ssids[0], i.e., "0", "1", "2", etc.
+
+  return (
+    <div className="info-card" style={{ padding: "10px", borderRadius: "5px" }}>
+      <strong>SSID:</strong>{" "}
+      <span style={{ color: statusIndex === "0" ? "green" : "black" }}>
+        {deviceInfo.ssid1 || "-"}
+      </span>{" "}
+      <span style={{ color: statusIndex === "1" ? "green" : "black" }}>
+        {deviceInfo.ssid2 || "-"}
+      </span>{" "}
+      <span style={{ color: statusIndex === "2" ? "green" : "black" }}>
+        {deviceInfo.ssid3 || "-"}
+      </span>
+    </div>
+  );
+}
+
 export default function App() {
   const [port, setPort] = useState(null);
   const [writer, setWriter] = useState(null);
@@ -14,12 +35,16 @@ export default function App() {
     macId: "",
     fwVersion: "",
     serialNumber: "",
-    ssid: "",
+    ssid:-1,
+    ssid1: "",
+    ssid2: "",
+    ssid3: "",
     hbt_counter:0,
     hbt_timer:0,
     wifi_errors:0,
     tcp_errors:0,
-    mqtt_errors:0
+    mqtt_errors:0,
+
   });
 
   const terminalRef = useRef(null);
@@ -33,7 +58,7 @@ export default function App() {
   // Parse terminal data into device info
   const parseDeviceInfo = (data) => {
     console.log(data);
-  const info = { macId: "", fwVersion: "", serialNumber: "", ssid: "" };
+  const info = { macId: "", fwVersion: "", serialNumber: "",ssid:-1, ssid1: "",ssid2:"",ssid3:"" };
 
  if (data.startsWith("*MAC:")) {
       console.log(data);
@@ -56,7 +81,10 @@ export default function App() {
       const ssidParts = data.replace("*SSID,", "").split(",");
       // Take elements from index 3 onward as actual SSIDs
       const ssids = ssidParts.slice(2).filter(Boolean); 
-      info.ssid = ssids.join(", ").replace(/#$/, ""); // Join multiple SSIDs
+      info.ssid=ssids[0];
+      info.ssid1 = ssids[1];// Join multiple SSIDs
+      info.ssid2= ssids[2];
+      info.ssid3=ssids[3];
     }
     else if(data.startsWith("*HBT-")){
       console.log(data);
@@ -80,7 +108,10 @@ export default function App() {
     macId: info.macId || prev.macId,
     serialNumber: info.serialNumber || prev.serialNumber,
     fwVersion: info.fwVersion || prev.fwVersion,
-    ssid: info.ssid || prev.ssid,
+    ssid:info.ssid || prev.ssid,
+    ssid1: info.ssid1 || prev.ssid1,
+    ssid2: info.ssid2 || prev.ssid2,
+    ssid3: info.ssid3 || prev.ssid3,
     hbt_counter:info.hbt_counter || prev.hbt_counter,
     hbt_timer:info.hbt_timer || prev.hbt_timer,
     wifi_erros:info.wifi_erros || prev.wifi_errors,
@@ -262,12 +293,13 @@ let uartBuffer = "";
         </div>
 
         {/* Device Info Cards */}
-        <div className="info-cards">
+         <InfoCard deviceInfo={deviceInfo} />
+        {/* <div className="info-cards">
           <div className="info-card">
             <strong>ID:</strong> {deviceInfo.macId || "-"} / {deviceInfo.serialNumber || "-"} / {deviceInfo.fwVersion || "-"}
           </div>
           <div className="info-card">
-            <strong>SSID:</strong> {deviceInfo.ssid || "-"}
+            <strong>SSID:</strong> {deviceInfo.ssid1 || "-"} {deviceInfo.ssid2 || "-"} {deviceInfo.ssid3 || "-"}
           </div>
            <div className="info-card">
              <strong>HBT-S:</strong>  {deviceInfo.hbt_counter} / {deviceInfo.hbt_timer}
@@ -282,7 +314,7 @@ let uartBuffer = "";
              <strong>MQTT-ERRORS:</strong> {deviceInfo.mqtt_errors}
            </div>
            
-        </div>
+        </div> */}
 
         {/* Terminal */}
         <h2 className="subtitle">Incoming UART Data:</h2>

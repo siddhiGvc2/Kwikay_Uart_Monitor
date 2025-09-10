@@ -6,17 +6,17 @@ import "./App.css";
 function InfoCard({ deviceInfo }) {
   const statusIndex = deviceInfo.ssid; // This holds ssids[0], i.e., "0", "1", "2", etc.
 
-  console.log(statusIndex);
+
   return (
     <div className="info-card" style={{ padding: "10px", borderRadius: "5px" }}>
       <strong>SSID:</strong>{" "}
-      <span style={{ color: statusIndex === "0" ? "green" : "black" }}>
+      <span style={{ color: statusIndex === "1" ? "green" : "black" }}>
         {deviceInfo.ssid1 || "-"}
       </span>{" "}
-      <span style={{ color: statusIndex === "1" ? "green" : "black" }}>
+      <span style={{ color: statusIndex === "2" ? "green" : "black" }}>
         {deviceInfo.ssid2 || "-"}
       </span>{" "}
-      <span style={{ color: statusIndex === "2" ? "green" : "black" }}>
+      <span style={{ color: statusIndex === "3" ? "green" : "black" }}>
         {deviceInfo.ssid3 || "-"}
       </span>
     </div>
@@ -82,8 +82,8 @@ export default function App() {
       const ssidParts = data.replace("*SSID,", "").split(",");
       // Take elements from index 3 onward as actual SSIDs
       const ssids = ssidParts.slice(2).filter(Boolean); 
-      info.ssid=ssids[0];
-      console.log("SSID",ssids[0]);
+     
+     
       info.ssid1 = ssids[1];// Join multiple SSIDs
       info.ssid2= ssids[2];
       info.ssid3=ssids[3].replace(/#$/, "");  
@@ -101,6 +101,13 @@ export default function App() {
       setDeviceInfo((prev) => ({
         ...prev,
         tcp_errors: (prev.tcp_errors || 0) + 1,
+      }));
+    }
+     else if(data.startsWith("*WiFi:")){
+       const status = data.replace("*WiFi:", "").replace("#", "").trim(); 
+      setDeviceInfo((prev) => ({
+        ...prev,
+        ssid: status
       }));
     }
 

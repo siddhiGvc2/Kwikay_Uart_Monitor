@@ -116,8 +116,9 @@ export default function App() {
       const status = match && match[2] ? match[2].trim() : "SUCCESS";
 
       setDeviceInfo((prev) => {
-        const lastStatus = prev.mqtt_status || "SUCCESS";
+        const lastStatus = prev.mqtt_status || "FAILED";
          console.log("MQTT LAST STATUS", lastStatus);
+         console.log("MQTT Status:", status);
         const mqtt_errors =
           status === "FAILED" && lastStatus === "SUCCESS"
             ? (prev.mqtt_errors || 0) + 1
@@ -130,7 +131,7 @@ export default function App() {
         };
       });
      
-      console.log("MQTT Status:", status);
+      
     };
 
 

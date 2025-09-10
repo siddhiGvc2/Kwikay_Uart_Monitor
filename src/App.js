@@ -187,7 +187,7 @@ export default function App() {
             wifi_errors,
             wifi_status: "FAILED",
             ssid:"0",
-            wifi_failed_at:now
+            wifi_failed_at: lastStatus === "SUCCESS" ? now : prev.wifi_failed_at,
           };
        
       });

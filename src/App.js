@@ -116,7 +116,7 @@ export default function App() {
       const status = match && match[2] ? match[2].trim() : "SUCCESS";
 
       setDeviceInfo((prev) => {
-        const lastStatus = prev.mqtt_status || "FAILED";
+        const lastStatus = prev.mqtt_status;
          console.log("MQTT LAST STATUS", lastStatus);
          console.log("MQTT Status:", status);
         const mqtt_errors =

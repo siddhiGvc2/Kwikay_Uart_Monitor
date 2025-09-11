@@ -273,9 +273,13 @@ let uartBuffer = "";
     await writer.write(new TextEncoder().encode("*RST#\n"));
     setTimeout(async()=>{
       await writer.write(new TextEncoder().encode("*SSID?#\n"));
+     
+    },5000)
+
+    setTimeout(async()=>{
       await writer.write(new TextEncoder().encode("*TC?#\n"));
       await writer.write(new TextEncoder().encode("*PULSES?#\n"));
-    },5000)
+    },10000)
 
     // Setup reader
     const reader = selectedPort.readable.getReader();
@@ -456,10 +460,10 @@ let uartBuffer = "";
              <strong>MQTT-ERRORS:</strong> {deviceInfo.mqtt_errors || 0}
            </div>
              <div className="info-card2">
-             <strong>TC:</strong> {deviceInfo.tc || 0}
+             <strong>TC:</strong> {deviceInfo.tc || ""}
            </div>
              <div className="info-card2">
-             <strong>PULSES:</strong> {deviceInfo.pulses || 0}
+             <strong>PULSES:</strong> {deviceInfo.pulses || ""}
            </div>
            
         </div>

@@ -217,7 +217,7 @@ export default function App() {
        
       });
     }
-    else if(data.startsWith("*TC,"))
+    else if(data.startsWith("*TC"))
     {
       setDeviceInfo((prev) => ({
         ...prev,
@@ -501,7 +501,7 @@ let uartBuffer = "";
              <strong>TC:</strong> {deviceInfo.tc || ""}
            </div>
            <div className="info-card2">
-             <strong>PULSES:</strong> {deviceInfo.pulses || ""}
+             <strong>Channel Enabled:</strong> {deviceInfo.pulses || ""}
            </div>
            
         </div>

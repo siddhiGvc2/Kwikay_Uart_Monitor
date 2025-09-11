@@ -17,7 +17,7 @@ function transformMessage(msg) {
         }
     }
 
-    return `${prefix}${result.join(':')}${suffix}`;
+    return `${result.join(':')}`;
 }
 
 
@@ -496,12 +496,6 @@ let uartBuffer = "";
            </div>
             <div className="info-card">
              <strong>MQTT-ERRORS:</strong> {deviceInfo.mqtt_errors || 0}
-           </div>
-           <div className="info-card2">
-             <strong>LAST TC:</strong> {deviceInfo.lastTc || ""}
-           </div>
-           <div className="info-card2">
-             <strong>LAST PULSES:</strong> {deviceInfo.lastPulses || ""}
            </div>
            <div className="info-card2">
              <strong>TC:</strong> {deviceInfo.tc || ""}

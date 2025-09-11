@@ -221,7 +221,7 @@ export default function App() {
     }
     else if(data.startsWith("*CHENA"))
     {
-      info.pulses=transformMessage(input);
+      info.pulses=transformMessage(data);
     }
 
 

@@ -71,6 +71,8 @@ export default function App() {
     wifi_status:"FAILED",
     wifi_failure_duration: "", // Store the duration
     wifi_failed_at: "", // Reset failure timestamp
+    lastTc:"",
+    lastPulses:"",
     tc:"",
     pulses:""
 
@@ -87,7 +89,7 @@ export default function App() {
   // Parse terminal data into device info
   const parseDeviceInfo = (data) => {
     console.log(data);
-  const info = { macId: "", fwVersion: "", serialNumber: "",ssid: "", ssid1: "",ssid2:"",ssid3:"" ,tc:"",pulses:""};
+  const info = { macId: "", fwVersion: "", serialNumber: "",ssid: "", ssid1: "",ssid2:"",ssid3:"" ,tc:"",pulses:"",lastTc:"",lastPulses:""};
 
  if (data.startsWith("*MAC:")) {
       console.log(data);
@@ -217,10 +219,12 @@ export default function App() {
     }
     else if(data.startsWith("*TC,"))
     {
+      info.lastTc=deviceInfo.tc;
       info.tc=data;
     }
     else if(data.startsWith("*CHENA"))
     {
+      info.lastPulses=deviceInfo.pulses;
       info.pulses=transformMessage(data);
     }
 
@@ -246,7 +250,9 @@ export default function App() {
     wifi_failure_duration: info.wifi_failure_duration || prev.wifi_failure_duration,
     wifi_failed_at: info.wifi_failed_at || prev.wifi_failed_at, // Reset failure timestamp
     tc:info.tc || prev.tc,
-    pulses: info.pulses || prev.pulses
+    pulses: info.pulses || prev.pulses,
+    lastTc:info.lastTc || prev.lastTc,
+    lastPulses:info.lastPulses || prev.lastPulses
     
 
   }));
@@ -387,7 +393,9 @@ let uartBuffer = "";
     wifi_failure_duration: "", // Store the duration
     wifi_failed_at: "", // Reset failure timestamp
     tc:"",
-    pulses:"" });
+    pulses:"",
+    lastTc:"",
+    lastPulses:"" });
       setStatus("Disconnected");
       console.log("✅ Disconnected and cleared data");
     } catch (err) {
@@ -483,10 +491,16 @@ let uartBuffer = "";
             <div className="info-card">
              <strong>MQTT-ERRORS:</strong> {deviceInfo.mqtt_errors || 0}
            </div>
-             <div className="info-card2">
+           <div className="info-card2">
+             <strong>LAST TC:</strong> {deviceInfo.lastTc || ""}
+           </div>
+           <div className="info-card2">
+             <strong>LAST PULSES:</strong> {deviceInfo.lastPulses || ""}
+           </div>
+           <div className="info-card2">
              <strong>TC:</strong> {deviceInfo.tc || ""}
            </div>
-             <div className="info-card2">
+           <div className="info-card2">
              <strong>PULSES:</strong> {deviceInfo.pulses || ""}
            </div>
            

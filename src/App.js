@@ -50,6 +50,8 @@ export default function App() {
     wifi_status:"FAILED",
     wifi_failure_duration: "", // Store the duration
     wifi_failed_at: "", // Reset failure timestamp
+    tc:"",
+    pulses:""
 
   });
 
@@ -64,7 +66,7 @@ export default function App() {
   // Parse terminal data into device info
   const parseDeviceInfo = (data) => {
     console.log(data);
-  const info = { macId: "", fwVersion: "", serialNumber: "",ssid: "", ssid1: "",ssid2:"",ssid3:"" };
+  const info = { macId: "", fwVersion: "", serialNumber: "",ssid: "", ssid1: "",ssid2:"",ssid3:"" ,tc:"",pulses:""};
 
  if (data.startsWith("*MAC:")) {
       console.log(data);
@@ -192,6 +194,14 @@ export default function App() {
        
       });
     }
+    else if(data.startsWith("*TC,"))
+    {
+      info.tc=data;
+    }
+    else if(data.startsWith("*CHENA"))
+    {
+      info.pulses=data;
+    }
 
 
 
@@ -214,6 +224,8 @@ export default function App() {
     wifi_status:info.wifi_status || prev.wifi_status,
     wifi_failure_duration: info.wifi_failure_duration || prev.wifi_failure_duration,
     wifi_failed_at: info.wifi_failed_at || prev.wifi_failed_at, // Reset failure timestamp
+    tc:info.tc || prev.tc,
+    pulses: info.pulses || prev.pulses
     
 
   }));
@@ -261,6 +273,8 @@ let uartBuffer = "";
     await writer.write(new TextEncoder().encode("*RST#\n"));
     setTimeout(async()=>{
       await writer.write(new TextEncoder().encode("*SSID?#\n"));
+      await writer.write(new TextEncoder().encode("*TC?#\n"));
+      await writer.write(new TextEncoder().encode("*PULSES?#\n"));
     },5000)
 
     // Setup reader
@@ -327,7 +341,25 @@ let uartBuffer = "";
         setPort(null);
       }
       setUartData("");
-      setDeviceInfo({ macId: "", fwVersion: "", serialNumber: "", ssid: "" });
+      setDeviceInfo({  macId: "",
+    fwVersion: "",
+    serialNumber: "",
+    ssid: "",
+    ssid1: "",
+    ssid2: "",
+    ssid3: "",
+    hbt_counter:0,
+    hbt_timer:0,
+    wifi_errors:0,
+    tcp_errors:0,
+    mqtt_errors:0,
+    mqtt_status:"FAILED",
+    tcp_status:"FAILED",
+    wifi_status:"FAILED",
+    wifi_failure_duration: "", // Store the duration
+    wifi_failed_at: "", // Reset failure timestamp
+    tc:"",
+    pulses:"" });
       setStatus("Disconnected");
       console.log("✅ Disconnected and cleared data");
     } catch (err) {
@@ -422,6 +454,12 @@ let uartBuffer = "";
            </div>
             <div className="info-card">
              <strong>MQTT-ERRORS:</strong> {deviceInfo.mqtt_errors || 0}
+           </div>
+             <div className="info-card2">
+             <strong>TC:</strong> {deviceInfo.tc || 0}
+           </div>
+             <div className="info-card2">
+             <strong>PULSES:</strong> {deviceInfo.pulses || 0}
            </div>
            
         </div>

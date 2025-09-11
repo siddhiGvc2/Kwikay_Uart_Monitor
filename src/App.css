@@ -38,7 +38,17 @@ html, body, #root {
 }
 
 .info-card {
-  flex: 1 1 45%;
+  flex: 1 1 25%;
+  background-color: #f3f4f6;
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-weight: 600;
+  color: #111;
+  box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.info-card2{
+    flex: 1 1 45%;
   background-color: #f3f4f6;
   padding: 10px 12px;
   border-radius: 8px;

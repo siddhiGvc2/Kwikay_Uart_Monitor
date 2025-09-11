@@ -278,7 +278,10 @@ let uartBuffer = "";
 
     setTimeout(async()=>{
       await writer.write(new TextEncoder().encode("*TC?#\n"));
-      await writer.write(new TextEncoder().encode("*PULSES?#\n"));
+      setTimeout(async()=>{
+          await writer.write(new TextEncoder().encode("*PULSES?#\n"));
+      },2000)
+    
     },10000)
 
     // Setup reader

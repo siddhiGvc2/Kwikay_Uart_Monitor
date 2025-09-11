@@ -219,12 +219,18 @@ export default function App() {
     }
     else if(data.startsWith("*TC,"))
     {
-      info.lastTc=deviceInfo.tc;
+      setDeviceInfo((prev) => ({
+        ...prev,
+        lastTc:prev.tc
+      }));
       info.tc=data;
     }
     else if(data.startsWith("*CHENA"))
     {
-      info.lastPulses=deviceInfo.pulses;
+       setDeviceInfo((prev) => ({
+        ...prev,
+        lastPulses:prev.pulses
+      }));
       info.pulses=transformMessage(data);
     }
 

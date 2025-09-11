@@ -2,6 +2,20 @@ import { useState, useRef, useEffect } from "react";
 import "./App.css";
 
 
+function getTime(){
+  const now = new Date();
+
+// Get hours and minutes
+const hours = now.getHours().toString().padStart(2, '0');
+const minutes = now.getMinutes().toString().padStart(2, '0');
+
+// Format as hh:mm
+const timeString = `${hours}:${minutes}`;
+  return timeString;
+
+}
+
+
 function transformMessage(msg) {
     const prefix = "*CHENA:";
     const suffix = "#";
@@ -77,6 +91,8 @@ export default function App() {
     pulses:"",
     tcp_command:"",
     mqtt_command:"",
+    tcp_command_time:"",
+    mqtt_command_time:""
 
   });
 
@@ -91,7 +107,7 @@ export default function App() {
   // Parse terminal data into device info
   const parseDeviceInfo = (data) => {
     console.log(data);
-  const info = { macId: "", fwVersion: "", serialNumber: "",ssid: "", ssid1: "",ssid2:"",ssid3:"" ,tc:"",pulses:"",lastTc:"",lastPulses:"",tcp_command:"",mqtt_command:""};
+  const info = { macId: "", fwVersion: "", serialNumber: "",ssid: "", ssid1: "",ssid2:"",ssid3:"" ,tc:"",pulses:"",lastTc:"",lastPulses:"",tcp_command:"",mqtt_command:"",tcp_command_time:"",mqtt_command_time:""};
 
  if (data.startsWith("*MAC:")) {
       console.log(data);
@@ -222,10 +238,12 @@ export default function App() {
      else if(data.startsWith("*TCP-"))
     {
       info.tcp_command=data;
+      info.tcp_command_time=getTime();
     }
      else if(data.startsWith("*MQTT-"))
     {
        info.mqtt_command=data;
+       info.mqtt_command_time=getTime();
     }
     else if(data.startsWith("*TC"))
     {
@@ -270,7 +288,9 @@ export default function App() {
     lastTc:info.lastTc || prev.lastTc,
     lastPulses:info.lastPulses || prev.lastPulses,
     tcp_command:info.tcp_command || prev.tcp_command,
-    mqtt_command:info.mqtt_command || prev.mqtt_command
+    mqtt_command:info.mqtt_command || prev.mqtt_command,
+    tcp_command_time:info.tcp_command_time || prev.tcp_command_time,
+    mqtt_command_time:info.mqtt_command_time || prev.mqtt_command_time
     
 
   }));
@@ -413,7 +433,9 @@ let uartBuffer = "";
     tc:"",
     pulses:"",
     lastTc:"",
-    lastPulses:"" });
+    lastPulses:"",
+    tcp_command_time:"",
+    mqtt_command_time:""});
       setStatus("Disconnected");
       console.log("✅ Disconnected and cleared data");
     } catch (err) {
@@ -444,13 +466,14 @@ let uartBuffer = "";
   return (
     <div className="container">
       <div className="card">
+        <div style={{width:'100%',display:"flex",justifyContent:"space-around"}}>
         <h1 className="title">UART Dashboard</h1>
-
+          <div>
         {/* Status */}
         <p className={`status ${status === "Connected" ? "connected" : "disconnected"}`}>
           Status: {status}
         </p>
-
+      
         {/* Connect / Disconnect */}
         {!port ? (
           <div className="center">
@@ -465,7 +488,8 @@ let uartBuffer = "";
             </button>
           </div>
         )}
-
+        </div>
+        </div>
         {/* Send */}
         <div className="send-section">
           <input
@@ -516,10 +540,10 @@ let uartBuffer = "";
              <strong>Channel Enabled:</strong> {deviceInfo.pulses || ""}
            </div>
             <div className="info-card2">
-             <strong>TCP COMMAND:</strong> {deviceInfo.tcp_command || ""}
+             <strong>TCP COMMAND:</strong> {deviceInfo.tcp_command || ""}@{deviceInfo.tcp_command_time}
            </div>
            <div className="info-card2">
-             <strong>MQTT COMMAND:</strong> {deviceInfo.mqtt_command || ""}
+             <strong>MQTT COMMAND:</strong> {deviceInfo.mqtt_command || ""}@{deviceInfo.mqtt_command_time}
            </div>
            
         </div>

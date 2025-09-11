@@ -526,7 +526,7 @@ let uartBuffer = "";
              <strong>HBT-S:</strong>  {deviceInfo.hbt_counter} / {deviceInfo.hbt_timer}
            </div>
               <div className="info-card">
-             <strong>WIFI Failed @ </strong> {deviceInfo.wifi_failed_at || 0}<strong>WIFI Restored @ </strong>{deviceInfo.wifi_failure_duration || 0}
+             <strong>WIFI Failed @ </strong> {deviceInfo.wifi_failed_at || "-"} <strong>WIFI Restored @ </strong>{deviceInfo.wifi_failure_duration || "-"}
            </div>
             <div className="info-card">
              <strong>TCP-ERRORS:</strong> {deviceInfo.tcp_errors || 0}

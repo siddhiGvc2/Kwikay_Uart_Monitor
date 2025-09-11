@@ -212,7 +212,7 @@ export default function App() {
      
       
     }
-    else if(data.startsWith("*WiFi failed bit set"))
+    else if(data.startsWith("*SEARCHING WIFI"))
     {
         
         setDeviceInfo((prev) => {

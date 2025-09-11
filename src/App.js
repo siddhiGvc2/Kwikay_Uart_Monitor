@@ -74,7 +74,9 @@ export default function App() {
     lastTc:"",
     lastPulses:"",
     tc:"",
-    pulses:""
+    pulses:"",
+    tcp_command:"",
+    mqtt_command:"",
 
   });
 
@@ -89,7 +91,7 @@ export default function App() {
   // Parse terminal data into device info
   const parseDeviceInfo = (data) => {
     console.log(data);
-  const info = { macId: "", fwVersion: "", serialNumber: "",ssid: "", ssid1: "",ssid2:"",ssid3:"" ,tc:"",pulses:"",lastTc:"",lastPulses:""};
+  const info = { macId: "", fwVersion: "", serialNumber: "",ssid: "", ssid1: "",ssid2:"",ssid3:"" ,tc:"",pulses:"",lastTc:"",lastPulses:"",tcp_command:"",mqtt_command:""};
 
  if (data.startsWith("*MAC:")) {
       console.log(data);
@@ -217,6 +219,14 @@ export default function App() {
        
       });
     }
+     else if(data.startsWith("*TCP-"))
+    {
+      info.tcp_command=data;
+    }
+     else if(data.startsWith("*MQTT-"))
+    {
+       info.mqtt_command=data;
+    }
     else if(data.startsWith("*TC"))
     {
       setDeviceInfo((prev) => ({
@@ -258,7 +268,9 @@ export default function App() {
     tc:info.tc || prev.tc,
     pulses: info.pulses || prev.pulses,
     lastTc:info.lastTc || prev.lastTc,
-    lastPulses:info.lastPulses || prev.lastPulses
+    lastPulses:info.lastPulses || prev.lastPulses,
+    tcp_command:info.tcp_command || prev.tcp_command,
+    mqtt_command:info.mqtt_command || prev.mqtt_command
     
 
   }));
@@ -502,6 +514,12 @@ let uartBuffer = "";
            </div>
            <div className="info-card2">
              <strong>Channel Enabled:</strong> {deviceInfo.pulses || ""}
+           </div>
+            <div className="info-card2">
+             <strong>TCP COMMAND:</strong> {deviceInfo.tcp_command || ""}
+           </div>
+           <div className="info-card2">
+             <strong>MQTT COMMAND:</strong> {deviceInfo.mqtt_command || ""}
            </div>
            
         </div>

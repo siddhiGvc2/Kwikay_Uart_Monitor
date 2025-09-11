@@ -2,6 +2,27 @@ import { useState, useRef, useEffect } from "react";
 import "./App.css";
 
 
+function transformMessage(msg) {
+    const prefix = "*CHENA:";
+    const suffix = "#";
+    const core = msg.slice(prefix.length, -1); // "1:1:0:1:1:1:1"
+
+    const parts = core.split(':'); // ['1', '1', '0', '1', '1', '1', '1']
+    
+    let result = [parts[0]]; // Keep the first part as-is ('1')
+
+    for (let i = 1; i < parts.length; i++) {
+        if (parts[i] === '1') {
+            result.push((i + 1).toString());  // Position index +1
+        }
+    }
+
+    return `${prefix}${result.join(':')}${suffix}`;
+}
+
+
+
+
 
 function InfoCard({ deviceInfo }) {
   const statusIndex = deviceInfo.ssid; // This holds ssids[0], i.e., "0", "1", "2", etc.
@@ -200,7 +221,7 @@ export default function App() {
     }
     else if(data.startsWith("*CHENA"))
     {
-      info.pulses=data;
+      info.pulses=transformMessage(input);
     }
 
 

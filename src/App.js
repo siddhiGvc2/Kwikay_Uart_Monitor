@@ -185,7 +185,7 @@ export default function App() {
           ...prev,
           ssid: data.replace("*WiFi:", "").replace("#", "").trim(),
           wifi_status: "SUCCESS",
-          wifi_failure_duration: timeDiffSeconds, // Store the duration
+          wifi_failure_duration: getTime(), // Store the duration
           
         };
       });
@@ -214,7 +214,7 @@ export default function App() {
     }
     else if(data.startsWith("*WiFi failed bit set"))
     {
-        const now = Date.now(); 
+        
         setDeviceInfo((prev) => {
          const lastStatus = prev.wifi_status;
          const wifi_errors =
@@ -230,7 +230,8 @@ export default function App() {
             wifi_errors,
             wifi_status: "FAILED",
             ssid:"0",
-            wifi_failed_at: lastStatus === "SUCCESS" ? now : prev.wifi_failed_at,
+            wifi_failed_at: lastStatus === "SUCCESS" ? getTime() : prev.wifi_failed_at,
+            wifi_failure_duration:"-"
           };
        
       });

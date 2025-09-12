@@ -92,7 +92,8 @@ export default function App() {
     tcp_command:"",
     mqtt_command:"",
     tcp_command_time:"",
-    mqtt_command_time:""
+    mqtt_command_time:"",
+    inh:"",
 
   });
 
@@ -107,7 +108,7 @@ export default function App() {
   // Parse terminal data into device info
   const parseDeviceInfo = (data) => {
     console.log(data);
-  const info = { macId: "", fwVersion: "", serialNumber: "",ssid: "", ssid1: "",ssid2:"",ssid3:"" ,tc:"",pulses:"",lastTc:"",lastPulses:"",tcp_command:"",mqtt_command:"",tcp_command_time:"",mqtt_command_time:""};
+  const info = { macId: "", fwVersion: "", serialNumber: "",ssid: "", ssid1: "",ssid2:"",ssid3:"" ,tc:"",pulses:"",lastTc:"",lastPulses:"",tcp_command:"",mqtt_command:"",tcp_command_time:"",mqtt_command_time:"",inh:""};
 
  if (data.startsWith("*MAC:")) {
       console.log(data);
@@ -262,6 +263,11 @@ export default function App() {
       }));
       info.pulses=transformMessage(data);
     }
+    else if(data.startsWith("*INH:"))
+    {
+       info.inh = data.split(":")[1].replace(/#$/, "");
+      
+    }
 
 
 
@@ -291,7 +297,8 @@ export default function App() {
     tcp_command:info.tcp_command || prev.tcp_command,
     mqtt_command:info.mqtt_command || prev.mqtt_command,
     tcp_command_time:info.tcp_command_time || prev.tcp_command_time,
-    mqtt_command_time:info.mqtt_command_time || prev.mqtt_command_time
+    mqtt_command_time:info.mqtt_command_time || prev.mqtt_command_time,
+    inh:info.inh || prev.inh,
     
 
   }));
@@ -436,7 +443,8 @@ let uartBuffer = "";
     lastTc:"",
     lastPulses:"",
     tcp_command_time:"",
-    mqtt_command_time:""});
+    mqtt_command_time:"",
+    inh:""});
       setStatus("Disconnected");
       console.log("✅ Disconnected and cleared data");
     } catch (err) {
@@ -534,11 +542,14 @@ let uartBuffer = "";
             <div className="info-card">
              <strong>MQTT-ERRORS:</strong> {deviceInfo.mqtt_errors || 0}
            </div>
-           <div className="info-card2">
+           <div className="info-card">
              <strong>TC:</strong> {deviceInfo.tc || ""}
            </div>
-           <div className="info-card2">
+           <div className="info-card">
              <strong>Channel Enabled:</strong> {deviceInfo.pulses || ""}
+           </div>
+            <div className="info-card">
+             <strong>INH:</strong> {deviceInfo.inh || ""}
            </div>
             <div className="info-card2">
              <strong>TCP COMMAND:</strong> {deviceInfo.tcp_command || ""}@{deviceInfo.tcp_command_time}

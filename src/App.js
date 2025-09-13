@@ -549,7 +549,7 @@ let uartBuffer = "";
              <strong>Channel Enabled:</strong> {deviceInfo.pulses || ""}
            </div>
             <div className="info-card">
-             <strong>INH:</strong> {deviceInfo.inhg || ""}
+             <strong>INH:</strong> {deviceInfo.inh || ""}
            </div>
             <div className="info-card2">
              <strong>TCP COMMAND:</strong> {deviceInfo.tcp_command || ""}@{deviceInfo.tcp_command_time}

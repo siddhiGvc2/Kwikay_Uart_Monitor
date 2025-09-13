@@ -263,9 +263,9 @@ export default function App() {
       }));
       info.pulses=transformMessage(data);
     }
-    else if(data.startsWith("*INH:"))
+    else if(data.startsWith("*INH,"))
     {
-       info.inh = data.split(":")[1].replace(/#$/, "");
+       info.inh = data.split(",")[1].replace(/#$/, "");
       
     }
 
@@ -549,7 +549,7 @@ let uartBuffer = "";
              <strong>Channel Enabled:</strong> {deviceInfo.pulses || ""}
            </div>
             <div className="info-card">
-             <strong>INH:</strong> {deviceInfo.inh || ""}
+             <strong>INH:</strong> {deviceInfo.inhg || ""}
            </div>
             <div className="info-card2">
              <strong>TCP COMMAND:</strong> {deviceInfo.tcp_command || ""}@{deviceInfo.tcp_command_time}
